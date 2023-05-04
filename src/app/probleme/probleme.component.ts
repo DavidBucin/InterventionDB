@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VerifierCaracteresValidator } from '../shared/longueur-minimum/longueur-minimum.component';
 import { ProblemeService } from './probleme.service';
 import { ITypeProbleme } from './typeProbleme';
+import { emailMatcherValidator } from '../shared/longueur-minimum/email-matcher/email-matcher.component';
 
 @Component({
   selector: 'Inter-probleme',
@@ -17,6 +18,7 @@ export class ProblemeComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private typeproblemeService: ProblemeService
+    
   ) {}
 
   ngOnInit() {
@@ -35,19 +37,21 @@ export class ProblemeComponent implements OnInit {
         courrielConfirmation: [{ value: '', disabled: true }],
       }),
       telephone: [{ value: '', disabled: true }],
+      notification: ['pasnotification'],
     });
 
     this.typeproblemeService.obtenirTypesProbleme().subscribe(
       (typesProbleme) => (this.typesProbleme = typesProbleme),
       (error) => (this.errorMessage = <any>error)
     );
+    this.problemeForm.get("notification").valueChanges.subscribe(value => this.gestionNotification(value));
   }
   save(): void {}
 
-  gestionNotification(typeNotification: string): void {
+  gestionNotification(notifyVia: string): void {
     const courrielControl = this.problemeForm.get('courrielGroup.courriel');
     const courrielConfirmationControl = this.problemeForm.get('courrielGroup.courrielConfirmation');   
-    const courrielGroupControl = this.problemeForm.get('datesGroup');   
+    const courrielGroupControl = this.problemeForm.get('courrielGroup');   
     
     const telephoneControl = this.problemeForm.get('telephone');   
 
@@ -65,27 +69,27 @@ export class ProblemeComponent implements OnInit {
     telephoneControl.reset();    
     telephoneControl.disable();
 
-    if (typeNotification === 'Courriel') {   
-      //courrielControl.setValidators([Validators.required]);      
-      //courrielControl.enable();  
-      //dateExpeditionControl.setValidators([Validators.required]);              
-      //dateExpeditionControl.enable();  
-      // Si le validateur est dans un autre fichier l'écire sous la forme suivante : 
-      // ...Validators.compose([classeDuValidateur.NomDeLaMethode()])])
-      //datesGroupControl.setValidators([Validators.compose([datesValides])]);                       
-}   
-else
-{
-  if(typeNotification === 'Téléphone')
-  {
-    telephoneControl.setValidators([Validators.required]);      
-    telephoneControl.disable();           
-  }
-}
+    if (notifyVia === 'courriel') {
+       courrielGroupControl.setValidators([Validators.compose([emailMatcherValidator.courrielDifferents()])])
+       courrielControl.setValidators([Validators.required, Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+')]);
+       courrielConfirmationControl.setValidators([Validators.required, Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+')]);
+       courrielControl.enable();
+       courrielConfirmationControl.enable();
+    
+       } else {
+      if (notifyVia === 'telephone') {
+        telephoneControl.setValidators([
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(10),
+          Validators.pattern('[0-9]+'),
+        ]);
+        telephoneControl.enable();
+      } 
 
 
 courrielControl.updateValueAndValidity();   
 courrielConfirmationControl.updateValueAndValidity();         
 telephoneControl.updateValueAndValidity();
   }
-}
+}}
