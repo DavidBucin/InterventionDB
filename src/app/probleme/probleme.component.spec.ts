@@ -165,5 +165,68 @@ describe('ProblemeComponent', () => {
     expect(group.invalid).toBeFalse();
   });
   
+  it('#29 | Zone TELEPHONE est activée quand notifier par messagerie texte '
+  , () =>{
+    component.gestionNotification("messageTexte")
+
+    let zone = component.problemeForm.get("telephone");
+    expect(zone.enabled).toBeFalse();
+  });
+  it('#30 | Zone ADRESSE COURRIEL est désactivée quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+
+    let zone = component.problemeForm.get("telephone");
+    expect(zone.disabled).toBeTrue();
+  });
+  it('#31 | Zone CONFIRMER COURRIEL est désactivée quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+
+    let zone = component.problemeForm.get("courrielGroup.courriel");
+    expect(zone.disabled).toBeTrue();
+  });
+  it('#32 | Zone TELEPHONE est invalide sans valeur quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+
+    let zone = component.problemeForm.get("telephone");
+    zone.setValue('a'.repeat(0))
+    expect(zone.status).toBeTruthy();
+  });
+  it('#33 | Zone TELEPHONE est invalide avec des caractères non-numériques quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+    let telephone = component.problemeForm.get("telephone")
+    telephone.setValue("asdfgh")
+    let errors = telephone.errors || {};
+    expect(errors["pattern"]).toBeFalsy();
+  });
+  it('#34 | Zone TELEPHONE est invalide avec 9 chiffres consécutifs quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+    let zone = component.problemeForm.get("telephone")
+    zone.setValue("012345678")
+    let errors = zone.errors || {};
+    expect(errors["minLength"]).toBeFalsy();
+  });
+  it('#35 | Zone TELEPHONE est invalide avec 11 chiffres consécutifs quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+    let zone = component.problemeForm.get("telephone")
+    zone.setValue("01234567891")
+    let errors = zone.errors || {};
+    expect(errors["minLength"]).toBeFalsy();
+  });
+  it('#36 | Zone TELEPHONE est valide avec 10 chiffres consécutifs quand notifier par messagerie texte'
+  , () =>{
+    component.gestionNotification("messageTexte")
+    let zone = component.problemeForm.get("telephone")
+    zone.setValue('1234567891')
+    let errors = zone.errors || {};
+    expect(errors["required"]).toBeFalsy();
+  });
+
+
 
 });
