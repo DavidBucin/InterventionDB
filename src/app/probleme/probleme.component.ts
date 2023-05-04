@@ -38,6 +38,10 @@ export class ProblemeComponent implements OnInit {
       }),
       telephone: [{ value: '', disabled: true }],
       notification: ['pasnotification'],
+      descriptionProbleme: ['', [Validators.required, Validators.minLength(5)]],
+      noUnite: '',
+      dateProbleme: {value: Date(), disabled: true}
+
     });
 
     this.typeproblemeService.obtenirTypesProbleme().subscribe(
